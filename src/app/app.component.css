@@ -1,0 +1,15 @@
+.parent-div{
+    display: flex;
+    justify-content: center;
+}
+
+.button-container{
+    display: flex;
+    justify-content: space-around;
+}
+
+button {
+    background-color: darkblue;
+    color: white;
+    padding: 1rem 1.25rem;
+}
