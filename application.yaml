@@ -1,74 +1,23 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: assignment2-deployment
-  labels:
-    app: assignment2
-  namespace: default
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: assignment2
-  template:
-    metadata:
-      labels:
-        app: assignment2
-    spec:
-      containers:
-        - name: assignment2
-          image: wilp03117/assignment2:latest
-          ports:
-            - containerPort: 8080
----
 apiVersion: argoproj.io/v1alpha1
-kind: Rollout
+kind: Application
 metadata:
-  name: assignment2-rollout
-  namespace: default
+  name: webapp
+  namespace: argocd
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: assignment2
-  strategy:
+  project: default
+  source:
+    repoURL: https://github.com/example/webapp.git
+    targetRevision: main
+    path: manifests
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+  rolloutStrategy:
     blueGreen:
-      activeService: assignment2-service
-      previewService: assignment2-preview-service
+      activeService: webapp-service
+      previewService: webapp-preview-service
       autoPromotionEnabled: true
-  template:
-    metadata:
-      labels:
-        app: assignment2
-    spec:
-      containers:
-      - name: assignment2
-        image: wilp03117/assignment2:latest
-        ports:
-        - containerPort: 8080
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: assignment2-service
-  namespace: default
-spec:
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8080
-  selector:
-    app: assignment2
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: assignment2-preview-service
-  namespace: default
-spec:
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8080
-  selector:
-    app: assignment2
